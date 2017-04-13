@@ -1,0 +1,18 @@
+{
+  "name": "subpar",
+  "version": "1.0.0",
+  "description": "",
+  "main": "lib/index.js",
+  "scripts": {},
+  "keywords": [],
+  "author": "Nathan LaFreniere <quitlahok@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "good": "^7.1.0",
+    "good-console": "^6.4.0",
+    "good-google-cloud": "^1.0.0",
+    "good-squeeze": "^5.0.2",
+    "hapi": "^16.1.1",
+    "joi": "^10.4.1"
+  }
+}
