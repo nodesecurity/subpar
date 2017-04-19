@@ -23,16 +23,18 @@ Passed through to [hapi's server.bind() method](https://github.com/hapijs/hapi/b
 Passed through to [hapi's server.decorate() method](https://github.com/hapijs/hapi/blob/master/API.md#serverdecoratetype-property-method-options).
 
 
-### `subpar.handle(handler, [condition])`
+### `subpar.register(options)`
 
-`handler` is a standard [hapi handler](https://github.com/hapijs/hapi/blob/master/API.md#route-handler).
+`options` is an object that may contain:
 
-`condition` is an optional object used to filter when a handler is used. It may contain the following properties:
-
-- `data`:  (object or joi validator) value or values contained in the message data that must match for this handler to be called
-- `attributes`: (object or joi validator) value or values contained in the message attributes that must match for this handler to be called
+- `handler`: (function) a standard [hapi handler](https://github.com/hapijs/hapi/blob/master/API.md#route-handler).
+- `condition`: (object) optional object used to determine when a handler is called. May contain the following properties:
+  - `data`:  (object or joi validator) value or values contained in the message data that must match for this handler to be called
+  - `attributes`: (object or joi validator) value or values contained in the message attributes that must match for this handler to be called
 
 Only *one* handler may be added without a condition since having no condition means that all valid payloads will be delivered to that handler. Multiple handlers may be added with conditions and the first matching handler will be called.
+
+When adding a handler with no conditions, as a shortcut the handler function can be passed directly to the `register` method.
 
 
 ### `server.initialize()`
@@ -54,20 +56,36 @@ const Subpar = require('subpar');
 
 const server = new Subpar('example');
 
-server.handle(function (request, reply) {
+// shortcut for catch all handler, you can also pass an object
+// with a 'handler' property and omit the 'condition'
+server.register(function (request, reply) {
 
   reply({ handler: 'fallback' });
 });
 
-server.handle(function (request, reply) {
+server.register({
+  handler: function (request, reply) {
 
-  reply({ handler: 'create' });
-}, { attributes: { type: 'create' } });
+    reply({ handler: 'create' });
+  },
+  condition: {
+    attributes: {
+      type: 'create'
+    }
+  }
+});
 
-server.handle(function (request, reply) {
+server.register({
+  handler: function (request, reply) {
 
-  reply({ handler: 'update' });
-}, { attributes: { type: 'update' } });
+    reply({ handler: 'update' });
+  },
+  condition: {
+    attributes: {
+      type: 'update'
+    }
+  }
+});
 
 server.start();
 ```

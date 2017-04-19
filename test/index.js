@@ -27,7 +27,7 @@ describe('subpar', () => {
 
       return reply('hello');
     };
-    server.handle(handler);
+    server.register(handler);
 
     expect(server.environment).to.equal('test');
     done();
@@ -41,7 +41,7 @@ describe('bind', () => {
     const server = new Subpar('test');
     server.bind({ test: { some: 'object' } });
 
-    server.handle(function (request, reply) {
+    server.register(function (request, reply) {
 
       reply(this.test);
     });
@@ -78,7 +78,7 @@ describe('decorate', () => {
       reply(request.test());
     };
 
-    server.handle(handler);
+    server.register(handler);
 
     return server.initialize().then(() => {
 
@@ -110,7 +110,36 @@ describe('handle', () => {
       reply({ some: 'object' });
     };
 
-    server.handle(handler);
+    server.register({ handler });
+
+    return server.initialize().then(() => {
+
+      const payload = {
+        subscription: 'test',
+        message: {
+          messageId: '1234',
+          data: {},
+          attributes: {}
+        }
+      };
+
+      return server.server.inject({ method: 'post', url: '/', payload });
+    }).then((res) => {
+
+      expect(res.statusCode).to.equal(200);
+      expect(res.result).to.equal({ some: 'object' });
+    });
+  });
+
+  it('can add a default handler (shorthand)', () => {
+
+    const server = new Subpar('test');
+    const handler = function (request, reply) {
+
+      reply({ some: 'object' });
+    };
+
+    server.register(handler);
 
     return server.initialize().then(() => {
 
@@ -139,10 +168,26 @@ describe('handle', () => {
       reply({ some: 'object' });
     };
 
-    server.handle(handler);
+    server.register(handler);
     expect(() => {
 
-      server.handle(handler);
+      server.register(handler);
+    }).to.throw();
+    done();
+  });
+
+  it('throws when trying to add a second default handler (shorthand)', (done) => {
+
+    const server = new Subpar('test');
+    const handler = function (request, reply) {
+
+      reply({ some: 'object' });
+    };
+
+    server.register({ handler });
+    expect(() => {
+
+      server.register({ handler });
     }).to.throw();
     done();
   });
@@ -155,7 +200,7 @@ describe('handle', () => {
       return reply('hello');
     };
 
-    server.handle(handler, { attributes: { type: 'test' } });
+    server.register({ handler, condition: { attributes: { type: 'test' } } });
 
     return server.initialize().then(() => {
 
@@ -186,7 +231,7 @@ describe('handle', () => {
       return reply('hello');
     };
 
-    server.handle(handler, { attributes: { type: 'test' } });
+    server.register({ handler, condition: { attributes: { type: 'test' } } });
 
     return server.initialize().then(() => {
 
@@ -221,8 +266,8 @@ describe('handle', () => {
       return reply('fallback');
     };
 
-    server.handle(handler, { attributes: { type: 'test' } });
-    server.handle(fallback);
+    server.register({ handler, condition: { attributes: { type: 'test' } } });
+    server.register({ handler: fallback });
 
     return server.initialize().then(() => {
 
@@ -271,7 +316,7 @@ describe('handle', () => {
       reply({ some: 'object' });
     };
 
-    server.handle(handler);
+    server.register({ handler });
 
     return server.initialize().then(() => {
 
@@ -301,7 +346,7 @@ describe('handle', () => {
       reply({ some: 'object' });
     };
 
-    server.handle(handler);
+    server.register({ handler });
 
     return server.initialize().then(() => {
 
@@ -331,7 +376,7 @@ describe('handle', () => {
       reply({ some: 'object' });
     };
 
-    server.handle(handler);
+    server.register({ handler });
 
     return server.initialize().then(() => {
 
@@ -374,7 +419,7 @@ describe('handle', () => {
       reply('hello');
     };
 
-    server.handle(handler);
+    server.register(handler);
 
     return server.start().then(() => {
 
