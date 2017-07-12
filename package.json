@@ -10,6 +10,7 @@
   "author": "Nathan LaFreniere <quitlahok@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "doodler": "^1.0.0",
     "good": "^7.1.0",
     "good-console": "^6.4.0",
     "good-google-cloud": "^1.0.0",
