@@ -1,6 +1,6 @@
 {
   "name": "subpar",
-  "version": "2.1.1",
+  "version": "3.0.0",
   "description": "a hapi wrapper for simpler google cloud pubsub push subscribers",
   "main": "lib/index.js",
   "scripts": {
